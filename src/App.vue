@@ -134,7 +134,7 @@ function closePop() {
     opacity: 0.6;
     height: 6vw;
     width: 90vw;
-    position: absolute;
+    position: fixed;
     bottom: 4vw;
     left: 50%;
     transform: translateX(-50%);
