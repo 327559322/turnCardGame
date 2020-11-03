@@ -25,31 +25,14 @@
     </div>
 
     <div class="prize-pop" v-show="isPop">
-      <img src="./static/prize.png" />
-      <div class="receive-btn">
+      <img :src="currentAdBus.img" />
+      <div class="receive-btn" @click="goToAdBusPage">
         立即领取
       </div>
       <img class="close" @click="isPop = false" src="./static/close-gg.png" />
     </div>
     <div class="rule-pop" v-show="isPopRule">
-      <div class="rule-content">
-        【活动奖品】<br />
-        此活动为概率中奖，奖品数量有限，祝好运！<br />
-        惊喜一：<br />
-        惊喜二： <br />
-        惊喜三：惊喜好礼 <br />
-        【特殊说明】<br />
-        在活动中获得道具、奖品后，如退出活动，可能导致道具或奖品丢失，请在获得道具、奖品后及时兑换或领取，避免损失。<br />
-        -------------------------------------- <br />
-        活动说明<br />
-        1.页面中展示的参与次数，为同一用户每天的参与次数；用户依据页面提示参与活动后，有机会获得相应礼品。参与活动用户的设备不同，参与活动的具体操作步骤请以进入活动页面时的实时展示为准。<br />
-        2、通过非法途径获得商品的，主办方有权不提供奖品。<br />
-        3、实物类奖品将在中奖后的30个工作日内发货，请注意查收；话费、红包等虚拟奖品将在中奖后的72小时内充值进用户填写的账号。敬请认真、准确填写领取账号，因个人原因填写错误，导致充值失败的，将不给予补发。<br />
-        4、因不可抗力、技术故障等原因，我们有权相应调整或终止活动，而无需向用户进行赔偿或补偿。<br />
-        5、活动期间内，用户存在作弊等违法违规行为的，将被撤销抽奖资格、奖品使用资格，收回已获得的权益。<br />
-        6、对活动规则、奖品使用规则、奖品领取等有疑问的，请在工作日9:00-18:00，按照如下方式联系客服：<br />
-        客服热线
-      </div>
+      <div class="rule-content" v-html="rule"></div>
     </div>
     <div class="footer">
       闽ICP备19014187号-2
@@ -60,6 +43,7 @@
 <script>
 import { ref, onMounted } from "vue";
 import Mask from "./components/mask";
+import { getGameRules, qryAdDetail, qryAdExposure, qryAdClick } from "./api";
 const currentCard = ref(1);
 const isPop = ref(false);
 const turnCardList = ref([]);
@@ -67,6 +51,12 @@ const turnCardTextList = ref([]);
 const lastCount = ref(9);
 const isPopRule = ref(false);
 const cardText = ["好运", "健康", "幸运", "暴富"];
+let rule = ref();
+let adBusUrlList = [];
+let currentAdBus = ref({
+  img: "",
+  url: ""
+});
 export default {
   name: "App",
   components: {
@@ -80,6 +70,19 @@ export default {
           currentCard.value = 1;
         }
       }, 800);
+      const adress = window.location.href;
+      const adId = window.location.pathname.split("/")[
+        window.location.pathname.split("/").length - 1
+      ];
+      getGameRules(adress).then(res => {
+        console.log(res);
+        rule.value = res.data?.data?.ruleOfActivity || `无`;
+        rule.value = rule.value.replace(/[\r\n]/g, "<br />");
+      });
+      qryAdDetail(adId).then(res => {
+        adBusUrlList = res?.data?.restsData || [];
+        console.log(adBusUrlList);
+      });
     });
     return {
       turnCardList,
@@ -89,7 +92,10 @@ export default {
       isPop,
       closePop,
       lastCount,
-      isPopRule
+      isPopRule,
+      rule,
+      goToAdBusPage,
+      currentAdBus
     };
   }
 };
@@ -99,6 +105,20 @@ function turnCard(index) {
     turnCardTextList.value[index] =
       cardText[parseInt(Math.random() * (3 - 0 + 1) + 0, 10)];
     lastCount.value--;
+    if (adBusUrlList.length > 0) {
+      const randomBusItem =
+        adBusUrlList[
+          parseInt(Math.random() * (adBusUrlList.length - 1 - 0 + 1) + 0, 10)
+        ];
+      currentAdBus.value = {
+        id: randomBusItem.businessId,
+        url: randomBusItem.landingPage,
+        img: randomBusItem.displayMaterial
+      };
+      qryAdExposure(randomBusItem.businessId).then(res => {
+        console.log(res);
+      });
+    }
     setTimeout(() => {
       isPop.value = true;
     }, 800);
@@ -107,6 +127,16 @@ function turnCard(index) {
 function closePop() {
   isPop.value = false;
   isPopRule.value = false;
+}
+function goToAdBusPage() {
+  if (adBusUrlList.length > 0) {
+    qryAdClick(currentAdBus.value.id).then(res => {
+      console.log(res);
+      window.location.href = currentAdBus.value.url;
+    });
+  } else {
+    alert("未配置落地页");
+  }
 }
 </script>
 <style lang="scss">
