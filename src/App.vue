@@ -71,9 +71,13 @@ export default {
         }
       }, 800);
       const adress = window.location.href;
-      const adId = window.location.pathname.split("/")[
+      let adId = "";
+      if (window.location.search.split("=").length > 1) {
+        adId = window.location.search.split("=")[1];
+      }
+      /* window.location.pathname.split("/")[
         window.location.pathname.split("/").length - 1
-      ];
+      ]; */
       getGameRules(adress).then(res => {
         console.log(res);
         rule.value = res.data?.data?.ruleOfActivity || `无`;
@@ -145,12 +149,14 @@ function goToAdBusPage() {
   background-repeat: no-repeat;
   background-size: 100% 100%;
   width: 100%;
-  padding-top: 44vw;
-  min-height: calc(100% - 44vw);
+  padding-top: 24vh;
+  min-height: calc(100% - 24vh);
+  position: relative;
   .top-tips {
     color: #fff;
     text-align: center;
     font-weight: bold;
+    font-size: 4vw;
   }
   .rule {
     width: 14.4vw;
@@ -164,7 +170,7 @@ function goToAdBusPage() {
     opacity: 0.6;
     height: 6vw;
     width: 90vw;
-    position: fixed;
+    position: absolute;
     bottom: 4vw;
     left: 50%;
     transform: translateX(-50%);
@@ -183,7 +189,7 @@ function goToAdBusPage() {
     position: relative;
     .card-forward {
       width: 23vw;
-      height: 34vw;
+      height: 30vw;
       margin: 4vw;
       background-image: url("static/card.png");
       background-repeat: no-repeat;
@@ -198,7 +204,7 @@ function goToAdBusPage() {
     .card-back {
       transition: all 1s;
       width: 23vw;
-      height: 34vw;
+      height: 30vw;
       margin: 4vw;
       backface-visibility: hidden;
       background-image: url("static/cardBack.png");
