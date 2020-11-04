@@ -149,8 +149,8 @@ function goToAdBusPage() {
   background-repeat: no-repeat;
   background-size: 100% 100%;
   width: 100%;
-  padding-top: 24vh;
-  min-height: calc(100% - 24vh);
+  padding-top: 43vw;
+  min-height: calc(100% - 43vw);
   position: relative;
   .top-tips {
     color: #fff;
@@ -294,6 +294,12 @@ function goToAdBusPage() {
   38.12% {
     -webkit-transform: rotate(0) scale(1);
     transform: rotate(0) scale(1);
+  }
+}
+
+@media screen and (min-width: 700px) {
+  .content {
+    min-height: 110%;
   }
 }
 </style>
