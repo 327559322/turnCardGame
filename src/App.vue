@@ -2,7 +2,8 @@
   <div class="content">
     <img src="./static/rule.png" class="rule" @click="isPopRule = true" />
     <div class="top-tips">
-      <span>今日剩余次数：{{ lastCount }}</span>
+      <span v-if="lastCount > 0">今日剩余次数：{{ lastCount }}</span>
+      <span v-else>今日次数用完</span>
     </div>
     <div class="card-group">
       <div
@@ -22,10 +23,13 @@
     </div>
 
     <div class="prize-pop" v-show="isPop">
-      <img :src="currentAdBus.img" @click="goToAdBusPage" />
-      <div class="receive-btn" @click="goToAdBusPage">
-        立即领取
-      </div>
+      <img src="./static/gameEnd.png" v-if="lastCount < 0" />
+      <template v-else>
+        <img :src="currentAdBus.img" @click="goToAdBusPage" />
+        <div class="receive-btn" @click="goToAdBusPage">
+          立即领取
+        </div>
+      </template>
       <img class="close" @click="isPop = false" src="./static/close-gg.png" />
     </div>
     <div class="rule-pop" v-show="isPopRule">
@@ -45,7 +49,7 @@ const currentCard = ref(1);
 const isPop = ref(false);
 const turnCardList = ref([]);
 const turnCardTextList = ref([]);
-const lastCount = ref(9);
+const lastCount = ref(8);
 const isPopRule = ref(false);
 const cardText = ["好运", "健康", "幸运", "暴富"];
 let rule = ref();
@@ -72,15 +76,13 @@ export default {
       if (window.location.search.split("=").length > 1) {
         adId = window.location.search.split("=")[1];
       }
-      /* window.location.pathname.split("/")[
-        window.location.pathname.split("/").length - 1
-      ]; */
       getGameRules(adress).then(res => {
         console.log(res);
         rule.value = res.data?.data?.ruleOfActivity || `无`;
         rule.value = rule.value.replace(/[\r\n]/g, "<br />");
       });
       qryAdDetail(adId).then(res => {
+        lastCount.value = res?.data?.data.dayLimit;
         adBusUrlList = res?.data?.restsData || [];
         console.log(adBusUrlList);
       });
@@ -101,7 +103,7 @@ export default {
   }
 };
 function turnCard(index) {
-  if (lastCount.value !== 0) {
+  if (lastCount.value > 0) {
     turnCardList.value.push(index);
     turnCardTextList.value[index] =
       cardText[parseInt(Math.random() * (3 - 0 + 1) + 0, 10)];
@@ -123,6 +125,9 @@ function turnCard(index) {
     setTimeout(() => {
       isPop.value = true;
     }, 800);
+  } else {
+    lastCount.value--;
+    isPop.value = true;
   }
 }
 function closePop() {
