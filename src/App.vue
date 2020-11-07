@@ -9,23 +9,20 @@
         v-for="index in 9"
         :key="index"
         class="card"
-        :class="{ isTurn: turnCardList.includes(index) }"
+        :class="{
+          isTurn: turnCardList.includes(index),
+          cardShake: currentCard === index && !turnCardList.includes(index)
+        }"
       >
-        <div
-          class="card-forward"
-          :class="{
-            cardShake: currentCard === index && !turnCardList.includes(index)
-          }"
-          @click="turnCard(index)"
-        ></div>
+        <div class="card-forward" @click="turnCard(index)"></div>
         <div class="card-back">
-          {{ turnCardTextList[index] }}
+          <span>{{ turnCardTextList[index] }}</span>
         </div>
       </div>
     </div>
 
     <div class="prize-pop" v-show="isPop">
-      <img :src="currentAdBus.img" />
+      <img :src="currentAdBus.img" @click="goToAdBusPage" />
       <div class="receive-btn" @click="goToAdBusPage">
         立即领取
       </div>
@@ -70,7 +67,7 @@ export default {
           currentCard.value = 1;
         }
       }, 800);
-      const adress = window.location.href;
+      const adress = window.location.href.replace("#/", "");
       let adId = "";
       if (window.location.search.split("=").length > 1) {
         adId = window.location.search.split("=")[1];
@@ -187,6 +184,10 @@ function goToAdBusPage() {
   flex-wrap: wrap;
   .card {
     position: relative;
+    &.cardShake {
+      -webkit-animation: cardShake 0.6s linear 0.2s 2;
+      animation: cardShake 0.6s linear 0.2s 2;
+    }
     .card-forward {
       width: 23vw;
       height: 30vw;
@@ -196,10 +197,6 @@ function goToAdBusPage() {
       background-size: 100% auto;
       backface-visibility: hidden;
       transition: all 1s;
-      &.cardShake {
-        -webkit-animation: cardShake 0.6s linear 0.2s 2;
-        animation: cardShake 0.6s linear 0.2s 2;
-      }
     }
     .card-back {
       transition: all 1s;
@@ -219,6 +216,9 @@ function goToAdBusPage() {
       font-weight: 500;
       color: #cb1413;
       font-size: 5vw;
+      > span {
+        margin-left: -1.5vw;
+      }
     }
     &.isTurn {
       .card-forward {
@@ -238,7 +238,7 @@ function goToAdBusPage() {
   top: 50%;
   transform: translateY(-50%);
   img {
-    width: 80%;
+    width: 80vw;
     top: 20vh;
     margin: auto;
     display: block;
@@ -253,11 +253,13 @@ function goToAdBusPage() {
     text-align: center;
     line-height: 8vw;
     font-size: 4vw;
+    margin-top: 2vh;
   }
   .close {
     width: auto;
     height: 8vw;
     margin: auto;
+    margin-left: 45%;
     margin-top: 4vw;
     color: #fff;
     text-align: center;
