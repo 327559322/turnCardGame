@@ -82,7 +82,7 @@ export default {
         rule.value = rule.value.replace(/[\r\n]/g, "<br />");
       });
       qryAdDetail(adId).then(res => {
-        lastCount.value = res?.data?.data.dayLimit;
+        lastCount.value = res?.data?.data?.dayLimit || 8;
         adBusUrlList = res?.data?.restsData || [];
         console.log(adBusUrlList);
       });
