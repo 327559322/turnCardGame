@@ -26,9 +26,9 @@
       <img src="./static/gameEnd.png" v-if="lastCount < 0" />
       <template v-else>
         <img :src="currentAdBus.img" @click="goToAdBusPage" />
-        <div class="receive-btn" @click="goToAdBusPage">
+        <!-- <div class="receive-btn" @click="goToAdBusPage">
           立即领取
-        </div>
+        </div> -->
       </template>
       <img class="close" @click="isPop = false" src="./static/close-gg.png" />
     </div>
@@ -58,6 +58,7 @@ let currentAdBus = ref({
   img: "",
   url: ""
 });
+let cardTurnLock = false;
 export default {
   name: "App",
   components: {
@@ -103,31 +104,35 @@ export default {
   }
 };
 function turnCard(index) {
-  if (lastCount.value > 0) {
-    turnCardList.value.push(index);
-    turnCardTextList.value[index] =
-      cardText[parseInt(Math.random() * (3 - 0 + 1) + 0, 10)];
-    lastCount.value--;
-    if (adBusUrlList.length > 0) {
-      const randomBusItem =
-        adBusUrlList[
-          parseInt(Math.random() * (adBusUrlList.length - 1 - 0 + 1) + 0, 10)
-        ];
-      currentAdBus.value = {
-        id: randomBusItem.businessId,
-        url: randomBusItem.landingPage,
-        img: randomBusItem.displayMaterial
-      };
-      qryAdExposure(randomBusItem.businessId).then(res => {
-        console.log(res);
-      });
-    }
-    setTimeout(() => {
+  if (!cardTurnLock) {
+    if (lastCount.value > 0) {
+      cardTurnLock = true;
+      turnCardList.value.push(index);
+      turnCardTextList.value[index] =
+        cardText[parseInt(Math.random() * (3 - 0 + 1) + 0, 10)];
+      lastCount.value--;
+      if (adBusUrlList.length > 0) {
+        const randomBusItem =
+          adBusUrlList[
+            parseInt(Math.random() * (adBusUrlList.length - 1 - 0 + 1) + 0, 10)
+          ];
+        currentAdBus.value = {
+          id: randomBusItem.businessId,
+          url: randomBusItem.landingPage,
+          img: randomBusItem.displayMaterial
+        };
+        qryAdExposure(randomBusItem.businessId).then(res => {
+          console.log(res);
+        });
+      }
+      setTimeout(() => {
+        isPop.value = true;
+        cardTurnLock = false;
+      }, 1000);
+    } else {
+      lastCount.value--;
       isPop.value = true;
-    }, 800);
-  } else {
-    lastCount.value--;
-    isPop.value = true;
+    }
   }
 }
 function closePop() {
@@ -237,16 +242,16 @@ function goToAdBusPage() {
 }
 .prize-pop {
   width: 100%;
-  height: 50vh;
   z-index: 1000;
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
   img {
     width: 80vw;
-    top: 20vh;
-    margin: auto;
-    display: block;
   }
   .receive-btn {
     width: 24vw;
