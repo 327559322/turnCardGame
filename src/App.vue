@@ -2,7 +2,7 @@
   <div class="content">
     <img src="./static/rule.png" class="rule" @click="isPopRule = true" />
     <div class="top-tips">
-      <span v-if="lastCount > 0">今日剩余次数：{{ lastCount }}</span>
+      <span v-if="lastCount > 0">今日剩余次数33：{{ lastCount }}</span>
       <span v-else>今日次数用完</span>
     </div>
     <div class="card-group">
@@ -107,7 +107,10 @@ function turnCard(index) {
   if (!cardTurnLock) {
     if (lastCount.value > 0) {
       cardTurnLock = true;
-      turnCardList.value.push(index);
+      setTimeout(() => {
+        // 防止安卓翻牌文字渲染不及时
+        turnCardList.value.push(index);
+      }, 10);
       turnCardTextList.value[index] =
         cardText[parseInt(Math.random() * (3 - 0 + 1) + 0, 10)];
       lastCount.value--;
