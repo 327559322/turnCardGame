@@ -2,7 +2,7 @@
   <div class="content">
     <img src="./static/rule.png" class="rule" @click="isPopRule = true" />
     <div class="top-tips">
-      <span v-if="lastCount > 0">今日剩余次数33：{{ lastCount }}</span>
+      <span v-if="lastCount > 0">今日剩余次数：{{ lastCount }}</span>
       <span v-else>今日次数用完</span>
     </div>
     <div class="card-group">
@@ -23,6 +23,7 @@
     </div>
 
     <div class="prize-pop" v-show="isPop">
+      <img class="close" @click="isPop = false" src="./static/close-gg.png" />
       <img src="./static/gameEnd.png" v-if="lastCount < 0" />
       <template v-else>
         <img :src="currentAdBus.img" @click="goToAdBusPage" />
@@ -30,7 +31,6 @@
           立即领取
         </div> -->
       </template>
-      <img class="close" @click="isPop = false" src="./static/close-gg.png" />
     </div>
     <div class="rule-pop" v-show="isPopRule">
       <div class="rule-content" v-html="rule"></div>
@@ -271,11 +271,9 @@ function goToAdBusPage() {
   .close {
     width: auto;
     height: 8vw;
-    margin: auto;
-    margin-left: 45%;
     margin-top: 4vw;
     color: #fff;
-    text-align: center;
+    align-self: flex-end;
   }
 }
 .rule-pop {
